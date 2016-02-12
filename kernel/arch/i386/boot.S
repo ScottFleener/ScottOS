@@ -27,13 +27,19 @@ _start:
   # Set stack pointer to temporary stack
   movl $stack_top, %esp
 
+  # Initialize core kernel before running global constructors
+  call kernel_early
+
+  # Call global constructors, not needed for now
+  # call init
+
   # Pass control to kernel
   call kernel_main
 
-  # Clear interrupts, halt and wait for interrupt
+  # Hang if kernel_main returns unexpectedly
   cli
-  hlt
 .Lhang:
+  hlt
   jmp .Lhang
 
 # Sets size of _start symbol to the current location (.) minus its start
